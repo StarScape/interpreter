@@ -1,3 +1,31 @@
+import Data.Maybe
+
+-- Parser combinators
+(parser1 <|> parser2) s =
+   let parser2IfNothing Nothing = parser2 s
+       parser2IfNothing x       = x
+   in
+     parser2IfNothing (parser1 s)
+
+(parser `modify` f) s =
+   let modResult Nothing      = Nothing
+       modResult (Just (x,y)) = Just (f x,y)
+   in
+     modResult (parser s)
+
+(parser1 <&> parser2) s =
+   let parser2After Nothing      = Nothing
+       parser2After (Just (x,s)) = (parser2 `modify` (\y -> (x,y))) s
+   in
+     parser2After (parser1 s)
+
+emptyseq s = Just ([],s)
+
+optional pr = (pr `modify` (consonto [])) <|> emptyseq
+               where consonto [] x = [x]
+-- /end parser combinators
+
+
 -- Type declarations for our AST
 type Variable = String
 type Val = Int
@@ -51,23 +79,4 @@ interpret (Assign v e) s = update s v (eval e s)
 interpret (Seq c1 c2)  s = interpret c2 (interpret c1 s)
 interpret (Cond e ifc elsec) s = switch (eval e s) (interpret ifc) (interpret elsec) s
 interpret (While e c) s = switch (eval e s) (interpret (Seq c (While e c))) id s
-
-data Token = Ident String
-           | Number Int
-           | Symbol String
-
-type Parser a = [Token] -> Maybe (a, [Token])
-
--- variable :: Parser Variable
--- expr     :: Parser Expr
--- literal  :: String -> Parser String
-
-number   :: Parser Val
-number (Number n : s) = Just (n, s)
-number _              = Nothing
-
-variable :: Parser Variable
-variable (Ident i : s) = Just (i, s)
-variable _             = Nothing
-
 
