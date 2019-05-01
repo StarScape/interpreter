@@ -1,4 +1,5 @@
 import Data.Maybe
+import Data.Char
 
 -- Parser combinators
 (parser1 <|> parser2) s =
@@ -80,3 +81,72 @@ interpret (Seq c1 c2)  s = interpret c2 (interpret c1 s)
 interpret (Cond e ifc elsec) s = switch (eval e s) (interpret ifc) (interpret elsec) s
 interpret (While e c) s = switch (eval e s) (interpret (Seq c (While e c))) id s
 
+-- ====================================
+-- |            Parser Code           |
+-- ====================================
+data Token = Ident String
+           | Number Int
+           | Symbol String
+           deriving Show
+
+-- ====================================
+-- |            Lexer Code            |
+-- ====================================
+
+-- Check if keyword
+keyword :: String -> Bool
+keyword s = s `elem` ["IF", "THEN", "ELSE", "ENDIF", "WHILE", "DO", "END"]
+
+-- Convert string to appropriate token type
+-- This allows us to share some code between keywords (IF/WHILE etc) and varnames
+keycheck :: String -> Token
+keycheck s | keyword s = Symbol s
+           | otherwise = Ident s
+
+-- It is a letter, number, ', or _
+letDigEtc :: Char -> Bool
+letDigEtc c = isLetter c || isDigit c || c == '\'' || c == '_'
+
+-- Is it whitespace?
+layout :: Char -> Bool
+layout c = c == ' ' || c == '\t' || c == '\n'
+
+-- Is is one of our special symbols?
+symbolchar :: Char -> Bool
+symbolchar c = c `elem` "*->:=;"
+
+-- Convert char to number 
+intOfDigit :: Char -> Int
+intOfDigit c = ord c - 48
+
+-- Top-level lexical analyzer function
+-- Takes an L string as input and tokenizes it to be passed on to the parser
+-- (I rewrote this with guards because I found the if statements hard to read)
+lexer :: String -> [Token]
+lexer [] = []
+lexer (a:x) | layout a     = lexer x
+            | a == '('     = Symbol "(" : (lexer x)
+            | a == ')'     = Symbol ")" : (lexer x)
+            | isLetter a   = getword [a] x
+            | isDigit a    = getnum (intOfDigit a) x
+            | symbolchar a = getsymbol [a] x
+            | otherwise    = error ("Lexical error : unrecognized token " ++ (a:x))
+
+-- Tokenize a varname/keyword
+-- (Again, I rewrote this with guards as a personal preference)
+getword :: String -> String -> [Token]
+getword l [] = [keycheck (reverse l)]
+getword l (a:x) | letDigEtc a = getword (a:l) x
+                | otherwise   = (keycheck (reverse l)) : (lexer (a:x))
+
+-- Tokenize a symbol
+getsymbol :: String -> String -> [Token]
+getsymbol l [] = [Symbol (reverse l)]
+getsymbol l (a:x) | symbolchar a = getsymbol (a:l) x
+                  | otherwise    = (Symbol (reverse l)) : (lexer (a:x))
+
+-- Tokenize an integer literal
+getnum :: Int -> String -> [Token]
+getnum n [] = [Number n]
+getnum n (a:x) | isDigit a = getnum (n*10 + (intOfDigit a)) x
+               | otherwise = (Number n) : (lexer (a:x))
