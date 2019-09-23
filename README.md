@@ -6,7 +6,7 @@
 * If statements
 * While loops
 
-It's a long way from being useful, but it *is* Turing-complete :)
+If that sounds difficult to program in, you're correct! But it *is* Turing-complete :). The point was not so much the design of the language, but learning about programming language implementation.
 
 Example program (computes the 11th fibonacci number):
 
@@ -26,4 +26,4 @@ do
 end
 ```
 
-The interpreter is written in Haskell, and was done for Dr. Patricia Johann's Functional Programming course at Appalachian State.
+The interpreter is written in Haskell, and was done as a final project for Dr. Patricia Johann's Functional Programming course at Appalachian State University.
