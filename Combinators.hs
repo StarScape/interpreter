@@ -1,7 +1,3 @@
--- This file contains some standard parser combinators.
--- Patricia Johann
--- 18 February 2014
-
 (parser1 <|> parser2) s =
    let parser2IfNothing Nothing = parser2 s
        parser2IfNothing x       = x
