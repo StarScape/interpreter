@@ -8,7 +8,9 @@
 * If statements
 * While loops
 
-If that sounds difficult to program in, you're correct! But it *is* Turing-complete :). The point was not so much the design of the language, but learning about programming language implementation (and functional-programming).
+If that sounds difficult to program in, you're correct! The point is not so much the design of the language, but learning about programming language implementation and functional programming.
+
+And it *is* Turing-complete, so the sky is the limit...technically...
 
 #### Example program (computes the 11th fibonacci number):
 
