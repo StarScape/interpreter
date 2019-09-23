@@ -1,3 +1,5 @@
+## Description
+
 ℓ (pronounced "ehl") is a tiny imperative programming language. It supports exactly 5 constructions:
 
 * Variable assignment
@@ -6,9 +8,9 @@
 * If statements
 * While loops
 
-If that sounds difficult to program in, you're correct! But it *is* Turing-complete :). The point was not so much the design of the language, but learning about programming language implementation.
+If that sounds difficult to program in, you're correct! But it *is* Turing-complete :). The point was not so much the design of the language, but learning about programming language implementation (and functional-programming).
 
-Example program (computes the 11th fibonacci number):
+#### Example program (computes the 11th fibonacci number):
 
 ```
 n := 11
